@@ -4,7 +4,7 @@ require_dependency 'application'
 class MultiSiteExtension < Spree::Extension
   version "1.0"
   description "Extention that will allow the store to support multiple sites each having their own taxonomies, products and orders"
-  url "http://yourwebsite.com/multi_site"
+  url "git://github.com/tunagami/spree-multi-site.git"
 
   # def self.require_gems(config)
   #   config.gem "gemname-goes-here", :version => '1.2.3'
@@ -44,7 +44,9 @@ class MultiSiteExtension < Spree::Extension
       before_filter :load_data
       private
       def load_data
-        @sites = Site.find(:all, :order=>"name")  
+        @sites = Site.find(:all, :order=>"name")
+        @tax_categories = TaxCategory.find(:all, :order=>"name")  
+        @shipping_categories = ShippingCategory.find(:all, :order=>"name")  
       end
     end
 
