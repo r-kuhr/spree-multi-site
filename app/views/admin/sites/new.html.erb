@@ -1,0 +1,11 @@
+<%= error_messages_for :site %>
+<h1><%= t("new_site") %></h1>
+<br/>
+<% form_for(:site, :url => collection_url) do |f| %>
+  <%= render :partial => "form", :locals => { :f => f } %>
+  <p>
+    <%= submit_tag t("create") %>
+  </p>
+<% end %>
+<br/>
+<%= link_to t('back'), collection_url %>

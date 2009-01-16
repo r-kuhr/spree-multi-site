@@ -1,0 +1,16 @@
+<table>
+  <tr>
+    <td><%= t("site_name") %>: </td>
+    <td>
+      <%= error_message_on :site, :name%>
+      <%= f.text_field :name  %>
+    </td>
+  </tr>
+  <tr>
+    <td><%= t("site_domain") %>:</td>
+    <td>
+      <%= error_message_on :site, :domain%>
+      <%= f.text_field :domain  %>
+    </td>
+  </tr>
+</table>

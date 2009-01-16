@@ -1,0 +1,14 @@
+<table cellspacing="5">
+  <tr>
+    <td><%= t("name")%>: </td>
+    <td>
+      <%=error_message_on :taxonomy, :name%>  
+      <%= text_field :taxonomy, :name  %>
+    </td>
+    <td><%= t("site")%>: </td>
+    <td>
+      <%=error_message_on :taxonomy, :site%>  
+      <%= collection_select(:taxonomy, :site_id, @sites, :id, :name, {:include_blank => true}, {"style" => "width:200px"}) %> 
+    </td>
+</tr>
+ 

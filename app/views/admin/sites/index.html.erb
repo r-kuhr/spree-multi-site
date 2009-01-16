@@ -1,0 +1,54 @@
+<h1><%= t("listing_sites") %></h1>
+
+<table>
+  <tr>
+    <td valign="top">
+      <table class="admin-report">
+        <thead>
+          <th><%= t("site_name") %></th>
+          <th><%= t("site_domain") %></th>
+          <th><%= t("action") %></th>
+        </thead>
+        <tbody>
+          <%- @sites.each do |site|%>
+          <tr>
+            <td width="175px"><%=link_to site.name, object_url(site) %></td>
+            <td width="175px"><%=link_to site.domain, object_url(site) %></td>
+            <td>
+            	<%=link_to t('edit'), edit_object_url(site) %> |
+            	<%=link_to t('destroy'), object_url(site), :confirm => t('are_you_sure'), :method => :delete %>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </td>
+    <td valign="top">
+      <% form_for :filter, :url => admin_sites_url, :html => { :method => :get } do |f| %>
+        <div id="search-col">
+          <table class="admin-search">
+            <thead>
+              <tr>
+                <th colspan="2"><%= t("site_details") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><%= t("name") %></td>
+                <td>
+                  <%= f.text_field :name, :size=>18 %>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <%=submit_tag t("search") %>
+        </div>
+      <% end %>
+    </td>
+  </tr>
+</table>
+            
+
+
+<%= link_to t('new_site'), new_object_url %>
+

@@ -1,0 +1,21 @@
+<table class="admin-report">
+  <tr>
+    <th><%= t("name") %></th>
+    <th><%= t("site") %></th>
+    <th><%= t("action") %></th>
+  </tr>
+<% for taxonomy in @taxonomies %>
+  <tr>
+	<td>
+	  <%= taxonomy.name %>
+    </td>
+  	<td>
+  	  <%= taxonomy.site.name if taxonomy.site %>
+      </td>
+    <td>
+      <%= link_to_edit taxonomy.id %> | <%= link_to_delete taxonomy %>
+    </td>
+  </tr>
+<% end %>
+</table>
+

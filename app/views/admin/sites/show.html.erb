@@ -1,0 +1,18 @@
+<h1><%= t("site_account") %></h1>        
+<br/>
+<table>
+  <tr>
+    <td><%= t("site_name") %>: &nbsp;</td>
+    <td>
+      <%= @site.name %>
+    </td>
+  </tr>  
+  <tr>
+    <td><%= t("site_domain") %>: &nbsp;</td>
+    <td>
+      <%= @site.domain %>
+    </td>
+  </tr>
+</table>
+<br/>
+<%= link_to t('edit'), edit_object_url %>
