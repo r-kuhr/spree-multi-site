@@ -1,0 +1,79 @@
+<% content_for :head do %>
+  <%= calendar_date_select_includes %>
+<% end %>
+<table cellspacing="5">
+  <tr>
+    <td><%= t("name")%>: </td>
+    <td>
+      <%=error_message_on :product, :name%>  
+      <%= text_field :product, :name  %>
+    </td>
+  </tr>
+  <tr>
+    <td nowrap><%=t("site_name")%>: </td>
+    <td>
+      <%=error_message_on :product, :site%>
+      <%= collection_select(:product, :site_id, @sites, :id, :name, {:include_blank => true}, {"style" => "width:200px"}) %>        
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top"><%= t("description")%>: </td>
+    <td>
+      <%= error_message_on :product, :description %>
+      <%= text_area :product, :description, {:cols => 90, :rows => 10} %>
+    </td>
+  </tr>
+  <tr>
+    <td nowrap><%= t("master_price")%>: </td>
+    <td>
+      <%=error_message_on :product, :master_price%>
+      <%= text_field :product, :master_price  %>
+    </td>
+  </tr>
+  <tr>
+    <td><%= t("available_on")%>: </td>
+    <td>
+      <%= error_message_on :product, :available %>
+      <%= calendar_date_select :product, :available_on, :style=>"width:150px" %>
+    </td>
+  </tr>
+  <% if @product.variant %>
+    <tr>
+      <td><%=t("sku")%>: </td>
+      <td>
+				<%= f.text_field :sku, :size => 16 %>
+			</td>
+    </tr>
+    <tr>
+      <td><%=t("on_hand")%>: </td>
+      <td>
+        <%= f.text_field :on_hand, :size => 4 %>        
+      </td>
+    </tr>
+  <% end %>
+  <tr>
+    <td nowrap><%=t("ext_shipping_shipping_categories")%>: </td>
+    <td>
+      <%=error_message_on :product, :shipping_category%>
+      <%= collection_select(:product, :shipping_category_id, @shipping_categories, :id, :name, {:include_blank => true}, {"style" => "width:200px"}) %>        
+    </td>
+  </tr>
+  <tr>
+    <td nowrap><%=t("tax_category")%>: </td>
+    <td>
+      <%=error_message_on :product, :tax_category%>      
+      <%= collection_select(:product, :tax_category_id, @tax_categories, :id, :name, {:include_blank => true}, {"style" => "width:200px"}) %>        
+    </td>
+  </tr>
+	<% Variant.additional_fields.select{|f| f[:only].nil? || f[:only].include?(:product) }.each do |field| %>
+		<%= render :partial => "shared/additional_field", :locals => {:field => field, :f => f} %>
+	<% end %>
+  <tr>
+    <td colspan="2">
+      <div id="image-listing">
+        <%= render :partial => 'images', :locals => {:viewable => @product, :f => f} -%>
+      </div>
+    </td>
+  </tr>
+</table>
