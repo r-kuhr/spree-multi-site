@@ -37,6 +37,12 @@ class MultiSiteExtension < Spree::Extension
     
     Spree::BaseController.class_eval do
       before_filter :get_site_and_products
+      
+      layout :get_layout
+      
+      def get_layout
+        @site.layout.empty? ? "application" : @site.layout
+      end
 
       def find_order      
         unless session[:order_id].blank?

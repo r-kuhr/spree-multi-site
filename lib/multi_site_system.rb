@@ -18,6 +18,6 @@ module MultiSiteSystem
   
   def get_site_and_products
     @site = current_site
-    @taxonomies = @site.taxonomies
+    @taxonomies = (@site ? @site.taxonomies : [])
   end
 end

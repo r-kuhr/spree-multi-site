@@ -13,6 +13,12 @@
       <%= @site.domain %>
     </td>
   </tr>
+  <tr>
+    <td><%= t("site_layout") %>: &nbsp;</td>
+    <td>
+      <%= @site.layout %>
+    </td>
+  </tr>
 </table>
 <br/>
 <%= link_to t('edit'), edit_object_url %>

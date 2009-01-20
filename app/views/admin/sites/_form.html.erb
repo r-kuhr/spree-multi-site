@@ -13,4 +13,11 @@
       <%= f.text_field :domain  %>
     </td>
   </tr>
+  <tr>
+    <td><%= t("site_layout") %>:</td>
+    <td>
+      <%= error_message_on :site, :layout%>
+      <%= f.text_field :layout  %>
+    </td>
+  </tr>
 </table>

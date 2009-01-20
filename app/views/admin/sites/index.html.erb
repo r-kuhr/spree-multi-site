@@ -7,13 +7,15 @@
         <thead>
           <th><%= t("site_name") %></th>
           <th><%= t("site_domain") %></th>
+          <th><%= t("site_layout") %></th>
           <th><%= t("action") %></th>
         </thead>
         <tbody>
           <%- @sites.each do |site|%>
           <tr>
-            <td width="175px"><%=link_to site.name, object_url(site) %></td>
-            <td width="175px"><%=link_to site.domain, object_url(site) %></td>
+            <td width="116px"><%=link_to site.name, object_url(site) %></td>
+            <td width="116px"><%=link_to site.domain, object_url(site) %></td>
+            <td width="117px"><%=link_to (site.layout || "N/A"), object_url(site) %></td>
             <td>
             	<%=link_to t('edit'), edit_object_url(site) %> |
             	<%=link_to t('destroy'), object_url(site), :confirm => t('are_you_sure'), :method => :delete %>

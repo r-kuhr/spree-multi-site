@@ -6,6 +6,14 @@ namespace :db do
     Dir.glob(File.join(MultiSiteExtension.root, "db", 'sample', '*.{yml,csv}')).each do |fixture_file|
       Fixtures.create_fixtures("#{MultiSiteExtension.root}/db/sample", File.basename(fixture_file, '.*'))
     end
+    
+    # Loading in all sample data into database.
+    site = Site.create(:name => "local", :domain => "localhost", :layout => "localhost")
+    site.products = Product.find(:all)
+    site.taxonomies = Taxonomy.find(:all)
+    site.orders = Order.find(:all)
+    site.save
+    
   end
 end
 
