@@ -1,0 +1,74 @@
+<% content_for :sub_menu do %>
+  <ul id="act-nav">
+    <li><%= link_to t("resend"), resend_admin_order_url(@order), :method => :post %></li>
+  </ul>
+<% end %>
+<%= render :partial => 'shared/order_tabs', :locals => {:current => "Order Details"} %>
+<%= render :partial => 'shared/order_details', :locals => {:order => @order} -%>
+
+<% if @order.bill_address %>
+  <table class="order-address">
+    <tr>
+      <th><%= t("bill_address") %></th>
+    </tr>
+    <tr>
+      <td>
+        <%= render :partial => 'shared/address', :locals => {:address => @order.bill_address} %>      
+      </td>
+    </tr>
+  </table>
+<% end %>
+<% if @order.ship_address %>
+  <table class="order-address">
+    <tr>
+      <th><%= t("ship_address") %></th>
+    </tr>
+    <tr>
+      <td>
+        <%= render :partial => 'shared/address', :locals => {:address => @order.ship_address} %>      
+      </td>
+    </tr>
+  </table>
+<% end %>
+<% if @order.user %>
+  <table class="order-address">
+    <tr>
+      <th><%= t("email") %></th>
+    </tr>
+    <tr>
+      <td><%= @order.user.email if @order.user%></td>
+    </tr>
+  </table>
+<% end %>
+</table>
+
+<table class="order-address">
+  <tr>
+    <th><%= t("site_name") %></th>
+  </tr>
+  <tr>
+    <td><%= @order.site ? "#{@order.site.name} - #{@order.site.domain}" : "N/A"%></td>
+  </tr>
+</table>
+
+
+<table class="basic-table">
+  <tr>
+    <th><%= t("event") %></th>
+    <th><%= t("user") %></th>
+    <th><%= "#{t('date')}/#{t('time')}" %></th>
+  </tr>
+  <% @order.state_events.sort.each do |event| %>
+    <tr>
+      <td><%=t("#{event.name}") %></td>
+      <td><%=event.user.email %></td>
+      <td><%=event.created_at.to_s(:db) %></td>
+    </tr>
+  <% end %>
+  <% if @order.state_events.empty? %>
+    <tr>
+      <td colspan="3"><%= t("none_available") %></td>
+    </tr>
+  <% end %>
+</table>
+<%= event_links %>

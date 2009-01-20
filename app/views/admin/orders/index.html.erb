@@ -1,0 +1,111 @@
+<% content_for :head do -%>
+  <%= calendar_date_select_includes %>
+<% end -%>
+<h1><%= t("listing_orders") %></h1>
+
+<table>
+  <tr>
+    <td valign="top">
+      <div id="order-summary">
+        <table class="admin-report" width="545">
+          <thead>
+            <tr>
+              <th><%= t("order_date") %></th>
+              <th><%= t("order_number") %></th>
+              <th><%= t("site_name") %></th>
+              <th><%= t("status") %></th>
+              <th><%= t("customer") %></th>
+              <th><%= t("total") %></th>
+            </tr>
+          </thead>
+          <tbody>
+          <% @orders.each do |order| %>
+            <tr class="<%= cycle('even', 'odd') %>">
+              <td><%=order.created_at.to_date%></td>
+              <td><%= link_to order.number, object_url(order) %></td>
+              <td><%= ((order.site.name) if order.site) %></td>
+              <td><%= t(order.state.downcase) %></td>
+              <td><%= order.user.email if order.user %></td>
+              <td><%= number_to_currency order.total %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </td>
+    <td valign="top">
+      <% form_for :filter, :url => admin_orders_url, :html => { :method => :get } do |f| %>
+        <div id="search-col">
+          <table class="admin-search">
+            <thead>
+              <tr>
+                <th colspan="2"><%= t("date_range") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><%= t("start") %>:</td>
+                <td>
+                  <%= error_message_on :filter, :start%>
+                  <%= calendar_date_select :filter, :start, :style=>"width:100px" %>
+                </td>
+              </tr>
+              <tr>
+                <td><%= t("stop") %>:</td>
+                <td>
+                  <%= error_message_on :filter, :stop%>
+                  <%= calendar_date_select :filter, :stop, :style=>"width:100px" %>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="admin-search">
+            <thead>
+              <tr>
+                <th colspan="2"><%= t("order_details") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><%= t("order_number") %></td>
+                <td>
+                  <%= f.text_field :number, :size=>13 %>
+                </td>
+              </tr>
+              <tr>
+                <td><%= t("status") %></td>
+                <td>
+                  <%= f.select :state, Order.state_machines['state'].states.collect {|status| status.titleize}, {:include_blank => true}, {:style => "width: 115px"}%>
+                </td>
+              </tr>
+              <tr>
+                <td><%= t("email") %></td>
+                <td>
+                  <%= f.text_field :customer, :size=>13 %>
+                </td>
+              </tr>
+              <tr>
+                <td><%= t("first_name") %></td>
+                <td>
+                  <%= f.text_field :firstname, :size=>13 %>
+                </td>
+              </tr>
+              <tr>
+                <td><%= t("last_name") %></td>
+                <td>
+                  <%= f.text_field :lastname, :size=>13 %>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2"><%= t("show_incomplete_orders") %>&nbsp;<%= f.check_box :checkout, {:style => "vertical-align:middle;"}%>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <%=submit_tag t("search") %>
+        </div>
+      <% end %>
+    </td>
+  </tr>
+</table>
+<%= render :partial => 'shared/paginate', :locals => {:collection => @orders, :options => generate_search_options(@filter)} unless @orders.empty? -%>
