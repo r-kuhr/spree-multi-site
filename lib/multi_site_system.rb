@@ -18,13 +18,6 @@ module MultiSiteSystem
   
   def get_site_and_products
     @site = current_site
-    logger.warn("+++++++++++++++++++++++++++++++")
-    logger.warn(@site.domain)
-    logger.warn(@site.taxonomies)
-    logger.warn("+++++++++++++++++++++++++++++++")
     @taxonomies = @site.taxonomies
-    @products = @site.products
   end
-    
-    
 end
