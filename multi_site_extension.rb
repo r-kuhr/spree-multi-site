@@ -51,15 +51,7 @@ class MultiSiteExtension < Spree::Extension
       prepend_before_filter :get_site_and_products
       private
       def load_data
-        # logger.warn("---------------------------")
-        # logger.warn(object.products.by_site(@site).active.find(:all, :page => {:start => 1, :size => Spree::Config[:products_per_page], :current => params[:p]}, :include => :images))
-        logger.info("-----TAXON_BEGIN----------------------")
-        logger.info(object)
-        logger.info(object.products)
-        logger.info("-----TAXON_END----------------------")
         @products ||= object.products.by_site(@site).active.find(:all, :page => {:start => 1, :size => Spree::Config[:products_per_page], :current => params[:p]}, :include => :images)
-        logger.info("(((((((((((((((((((PRODUCTS)))))))))))))))))))")
-        logger.info(@products)
         @product_cols = 3
       end
     end
