@@ -1,3 +1,3 @@
 = Multi Site
 
-Currently working on documentation.
+script/extension install git://github.com/tunagami/spree-multi-site.git
