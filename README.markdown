@@ -5,6 +5,7 @@ The extension will allow you to setup multiple sites with one spree installation
 # Site Overview
 
 To administer all of the sites go to `/admin/sites`.  There you can create a site instance.  Each site needs the following defined:
+
 1. **Name:** Each site needs a name defined for it.  It is used purely for display purposes in the admin tool.  It _can_ be used in a _layout_ template as well.
 
 2. **Domain:** Each site requires a domain to tell which site it should display.  So, if you want a site on _www.spreeshopping.com_ you would enter in that domain name here.  It will identify the site regardless of what port number you are coming in on (_3000_ which is the default for the development, _80_ for http, and _443_ for https).
