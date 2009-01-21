@@ -40,3 +40,4 @@ rake spree:extensions:multi_site:bootstrap_multi_site
 
 # To Do's
 + Display site name with the taxons in the `product-edit-taxons` view
++ Potentially allow products & taxonomies to be associated with multiple sites _(If this makes sense to do)_ 

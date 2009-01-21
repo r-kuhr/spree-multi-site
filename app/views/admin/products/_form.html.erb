@@ -10,7 +10,7 @@
     </td>
   </tr>
   <tr>
-    <td nowrap><%=t("site_name")%>: </td>
+    <td nowrap><%=t("site")%>: </td>
     <td>
       <%=error_message_on :product, :site%>
       <%= collection_select(:product, :site_id, @sites, :id, :name, {:include_blank => true}, {"style" => "width:200px"}) %>        

@@ -34,3 +34,19 @@ namespace :spree do
     end
   end
 end
+
+namespace :spree do
+  namespace :extensions do
+    namespace :multi_site do
+      desc "Copies public assets of the Multi Site to the instance public/ directory."
+      task :bootstrap_multi_site => :environment do
+        # Loading in all sample data into database.
+        site = Site.create(:name => "local", :domain => "localhost", :layout => "localhost")
+        site.products = Product.find(:all)
+        site.taxonomies = Taxonomy.find(:all)
+        site.orders = Order.find(:all)
+        site.save
+      end  
+    end
+  end
+end
