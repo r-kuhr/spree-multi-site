@@ -17,6 +17,7 @@ class MultiSiteExtension < Spree::Extension
     Product.class_eval do
       belongs_to :site
       named_scope :by_site, lambda {|site| {:conditions => ["products.site_id = ?", site.id]}}
+      named_scope :by_site_with_children, lambda {|site| {:conditions => ["products.site_id in (?)", site.self_and_children]}}
     end
     
     Order.class_eval do
@@ -68,10 +69,30 @@ class MultiSiteExtension < Spree::Extension
       before_filter :load_data
       private
       def load_data
-        @sites = Site.find(:all, :order=>"name")
+        @sites = @site.self_and_children
         @tax_categories = TaxCategory.find(:all, :order=>"name")  
         @shipping_categories = ShippingCategory.find(:all, :order=>"name")  
       end
+      
+      def collection
+        @name = params[:name] || ""
+        @sku = params[:sku] || ""
+        @deleted =  (params.key?(:deleted)  && params[:deleted] == "on") ? "checked" : ""
+
+        if @sku.blank?
+          if @deleted.blank?
+            @collection ||= end_of_association_chain.by_site_with_children(@site).active.by_name(@name).find(:all, :order => :name, :page => {:start => 1, :size => Spree::Config[:admin_products_per_page], :current => params[:p]})
+          else
+            @collection ||= end_of_association_chain.by_site_with_children(@site).deleted.by_name(@name).find(:all, :order => :name, :page => {:start => 1, :size => Spree::Config[:admin_products_per_page], :current => params[:p]})  
+          end
+        else
+          if @deleted.blank?
+            @collection ||= end_of_association_chain.by_site_with_children(@site).active.by_name(@name).by_sku(@sku).find(:all, :order => :name, :page => {:start => 1, :size => Spree::Config[:admin_products_per_page], :current => params[:p]})
+          else
+            @collection ||= end_of_association_chain.by_site_with_children(@site).deleted.by_name(@name).by_sku(@sku).find(:all, :order => :name, :page => {:start => 1, :size => Spree::Config[:admin_products_per_page], :current => params[:p]})
+          end
+        end
+      end  
     end
   
     ProductsController.class_eval do    
@@ -99,7 +120,7 @@ class MultiSiteExtension < Spree::Extension
       end
     end
     #############################################################################
-
+    
     
     #############################################################################
     # Overriding Spree Helpers
