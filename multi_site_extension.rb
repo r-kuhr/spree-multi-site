@@ -22,6 +22,7 @@ class MultiSiteExtension < Spree::Extension
     
     Order.class_eval do
       belongs_to :site
+      named_scope :by_site_with_children, lambda {|site| {:conditions => ["orders.site_id in (?)", site.self_and_children]}}
     end
     #############################################################################
     
@@ -64,7 +65,26 @@ class MultiSiteExtension < Spree::Extension
         @sites = Site.find(:all, :order=>"name")  
       end
     end
+    
+    Admin::OrdersController.class_eval do
+      private
+      def collection   
+        default_stop = (Date.today + 1).to_s(:db)
+        @filter = params.has_key?(:filter) ? OrderFilter.new(params[:filter]) : OrderFilter.new
 
+        scope = Order.by_site_with_children(@site).scoped(:include => [:shipments, {:creditcards => :address}])
+        scope = scope.by_number @filter.number unless @filter.number.blank?
+        scope = scope.by_customer @filter.customer unless @filter.customer.blank?
+        scope = scope.between(@filter.start, (@filter.stop.blank? ? default_stop : @filter.stop)) unless @filter.start.blank?
+        scope = scope.by_state @filter.state.classify.downcase.gsub(" ", "_") unless @filter.state.blank?
+        scope = scope.conditions "lower(addresses.firstname) LIKE ?", "%#{@filter.firstname.downcase}%" unless @filter.firstname.blank?
+        scope = scope.conditions "lower(addresses.lastname) LIKE ?", "%#{@filter.lastname.downcase}%" unless @filter.lastname.blank?
+        scope = scope.checkout_completed(@filter.checkout == '1' ? false : true)
+
+        @collection = scope.find(:all, :order => 'orders.created_at DESC', :include => :user, :page => {:size => Spree::Config[:orders_per_page], :current =>params[:p], :first => 1})
+      end
+    end
+    
     Admin::ProductsController.class_eval do
       before_filter :load_data
       private
