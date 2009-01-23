@@ -9,7 +9,7 @@ module MultiSiteSystem
   end
   
   def get_site_from_request
-    self.current_site = Site.find_by_domain(request.domain)
+    self.current_site = Site.find_by_domain(request.host)
   end
   
   def get_site_from_session
