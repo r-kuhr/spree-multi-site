@@ -12,6 +12,7 @@ class MultiSiteExtension < Spree::Extension
     # Overriding Spree Core Models
     Taxonomy.class_eval do
       belongs_to :site
+      named_scope :by_site_with_children, lambda {|site| {:conditions => ["taxonomies.site_id in (?)", site.self_and_children]}}
     end
 
     Product.class_eval do
@@ -62,7 +63,26 @@ class MultiSiteExtension < Spree::Extension
       before_filter :load_data
       private
       def load_data
-        @sites = Site.find(:all, :order=>"name")  
+        @sites = @site.self_and_children
+      end
+      
+      def collection
+        @collection = Taxonomy.by_site_with_children(@site)        
+      end
+    end
+    
+    Admin::TaxonsController.class_eval do
+      def available
+        if params[:q].blank?
+          @available_taxons = []
+        else
+          @available_taxons = @site.taxons.scoped(:conditions => ['lower(taxons.name) LIKE ?', "%#{params[:q].downcase}%"])
+        end
+        @available_taxons.delete_if { |taxon| @product.taxons.include?(taxon) }
+        respond_to do |format|
+          format.html
+          format.js {render :layout => false}
+        end
       end
     end
     

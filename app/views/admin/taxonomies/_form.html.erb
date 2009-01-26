@@ -8,7 +8,7 @@
     <td><%= t("site")%>: </td>
     <td>
       <%=error_message_on :taxonomy, :site%>  
-      <%= collection_select(:taxonomy, :site_id, @sites, :id, :name, {:include_blank => true}, {"style" => "width:200px"}) %> 
+      <%= collection_select(:taxonomy, :site_id, @sites, :id, :name, {:include_blank => false}, {"style" => "width:200px"}) %> 
     </td>
 </tr>
  
