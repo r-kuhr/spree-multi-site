@@ -1,4 +1,4 @@
-# Spree Multi-Site Extension
+# Squeejee Spree Multi-Site Extension
 
 The extension will allow you to setup multiple sites with one spree installation.  It gives you the ability to have different domains that direct to different stores with different layouts.  Orders, taxonomies and products will all be site specific entities now.
 

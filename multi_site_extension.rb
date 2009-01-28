@@ -12,15 +12,18 @@ class MultiSiteExtension < Spree::Extension
     # Overriding Spree Core Models
     Taxonomy.class_eval do
       belongs_to :site
+      named_scope :by_site_with_children, lambda {|site| {:conditions => ["taxonomies.site_id in (?)", site.self_and_children]}}
     end
 
     Product.class_eval do
       belongs_to :site
       named_scope :by_site, lambda {|site| {:conditions => ["products.site_id = ?", site.id]}}
+      named_scope :by_site_with_children, lambda {|site| {:conditions => ["products.site_id in (?)", site.self_and_children]}}
     end
     
     Order.class_eval do
       belongs_to :site
+      named_scope :by_site_with_children, lambda {|site| {:conditions => ["orders.site_id in (?)", site.self_and_children]}}
     end
     #############################################################################
     
@@ -60,18 +63,76 @@ class MultiSiteExtension < Spree::Extension
       before_filter :load_data
       private
       def load_data
-        @sites = Site.find(:all, :order=>"name")  
+        @sites = @site.self_and_children
+      end
+      
+      def collection
+        @collection = Taxonomy.by_site_with_children(@site)        
       end
     end
+    
+    Admin::TaxonsController.class_eval do
+      def available
+        if params[:q].blank?
+          @available_taxons = []
+        else
+          @available_taxons = @site.taxons.scoped(:conditions => ['lower(taxons.name) LIKE ?', "%#{params[:q].downcase}%"])
+        end
+        @available_taxons.delete_if { |taxon| @product.taxons.include?(taxon) }
+        respond_to do |format|
+          format.html
+          format.js {render :layout => false}
+        end
+      end
+    end
+    
+    Admin::OrdersController.class_eval do
+      private
+      def collection   
+        default_stop = (Date.today + 1).to_s(:db)
+        @filter = params.has_key?(:filter) ? OrderFilter.new(params[:filter]) : OrderFilter.new
 
+        scope = Order.by_site_with_children(@site).scoped(:include => [:shipments, {:creditcards => :address}])
+        scope = scope.by_number @filter.number unless @filter.number.blank?
+        scope = scope.by_customer @filter.customer unless @filter.customer.blank?
+        scope = scope.between(@filter.start, (@filter.stop.blank? ? default_stop : @filter.stop)) unless @filter.start.blank?
+        scope = scope.by_state @filter.state.classify.downcase.gsub(" ", "_") unless @filter.state.blank?
+        scope = scope.conditions "lower(addresses.firstname) LIKE ?", "%#{@filter.firstname.downcase}%" unless @filter.firstname.blank?
+        scope = scope.conditions "lower(addresses.lastname) LIKE ?", "%#{@filter.lastname.downcase}%" unless @filter.lastname.blank?
+        scope = scope.checkout_completed(@filter.checkout == '1' ? false : true)
+
+        @collection = scope.find(:all, :order => 'orders.created_at DESC', :include => :user, :page => {:size => Spree::Config[:orders_per_page], :current =>params[:p], :first => 1})
+      end
+    end
+    
     Admin::ProductsController.class_eval do
       before_filter :load_data
       private
       def load_data
-        @sites = Site.find(:all, :order=>"name")
+        @sites = @site.self_and_children
         @tax_categories = TaxCategory.find(:all, :order=>"name")  
         @shipping_categories = ShippingCategory.find(:all, :order=>"name")  
       end
+      
+      def collection
+        @name = params[:name] || ""
+        @sku = params[:sku] || ""
+        @deleted =  (params.key?(:deleted)  && params[:deleted] == "on") ? "checked" : ""
+
+        if @sku.blank?
+          if @deleted.blank?
+            @collection ||= end_of_association_chain.by_site_with_children(@site).active.by_name(@name).find(:all, :order => :name, :page => {:start => 1, :size => Spree::Config[:admin_products_per_page], :current => params[:p]})
+          else
+            @collection ||= end_of_association_chain.by_site_with_children(@site).deleted.by_name(@name).find(:all, :order => :name, :page => {:start => 1, :size => Spree::Config[:admin_products_per_page], :current => params[:p]})  
+          end
+        else
+          if @deleted.blank?
+            @collection ||= end_of_association_chain.by_site_with_children(@site).active.by_name(@name).by_sku(@sku).find(:all, :order => :name, :page => {:start => 1, :size => Spree::Config[:admin_products_per_page], :current => params[:p]})
+          else
+            @collection ||= end_of_association_chain.by_site_with_children(@site).deleted.by_name(@name).by_sku(@sku).find(:all, :order => :name, :page => {:start => 1, :size => Spree::Config[:admin_products_per_page], :current => params[:p]})
+          end
+        end
+      end  
     end
   
     ProductsController.class_eval do    
@@ -99,7 +160,7 @@ class MultiSiteExtension < Spree::Extension
       end
     end
     #############################################################################
-
+    
     
     #############################################################################
     # Overriding Spree Helpers
